@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todoapp/mainScreen.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,6 +15,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: ,);
+    return MaterialApp(
+      theme: ThemeData.light(useMaterial3: true),
+      home: Mainscreen(),
+    );
   }
 }
