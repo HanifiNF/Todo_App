@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todoapp/addTodo.dart';
 
 class Mainscreen extends StatefulWidget {
@@ -9,6 +10,29 @@ class Mainscreen extends StatefulWidget {
 }
 
 class _MainscreenState extends State<Mainscreen> {
+  List<String> todoList = [];
+
+  void addTodo({required String todoText}) {
+    setState(() {
+      todoList.insert(0, todoText);
+    });
+    updateLocalData();
+    Navigator.pop(context);
+  }
+
+  void updateLocalData() async {
+    // Obtain shared preferences.
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('todoList', todoList);
+  }
+
+  void loadData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    todoList = (prefs.getStringList("todoList") ?? []).toList();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,10 +47,13 @@ class _MainscreenState extends State<Mainscreen> {
               showModalBottomSheet(
                 context: context,
                 builder: (context) {
-                  return Container(
-                    padding: EdgeInsets.all(20),
-                    height: 180,
-                    child: Addtodo(),
+                  return Padding(
+                    padding: MediaQuery.of(context).viewInsets,
+                    child: Container(
+                      padding: EdgeInsets.all(20),
+                      height: 180,
+                      child: Addtodo(addTodo: addTodo),
+                    ),
                   );
                 },
               );
@@ -38,7 +65,34 @@ class _MainscreenState extends State<Mainscreen> {
           ),
         ],
       ),
-      body: Container(),
+      body: ListView.builder(
+        itemCount: todoList.length,
+        itemBuilder: (BuildContext context, int index) {
+          return ListTile(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return Container(
+                    padding: EdgeInsets.all(20),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          todoList.removeAt(index);
+                        });
+                        updateLocalData();
+                        Navigator.pop(context);
+                      },
+                      child: Text("Mark as done"),
+                    ),
+                  );
+                },
+              );
+            },
+            title: Text(todoList[index]),
+          );
+        },
+      ),
     );
   }
 }
