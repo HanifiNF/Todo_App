@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todoapp/addTodo.dart';
 
 class Mainscreen extends StatefulWidget {
   const Mainscreen({super.key});
@@ -17,18 +18,27 @@ class _MainscreenState extends State<Mainscreen> {
         centerTitle: true,
         title: Text('Todo App'),
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GestureDetector(
-              onTap: () {
-                print('Plus icon is clicked');
-              },
+          InkWell(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return Container(
+                    padding: EdgeInsets.all(20),
+                    height: 180,
+                    child: Addtodo(),
+                  );
+                },
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
               child: Icon(Icons.add),
             ),
           ),
         ],
       ),
-      body: Center(child: Text('Todo App')),
+      body: Container(),
     );
   }
 }
