@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:feather_icons/feather_icons.dart';
 
 class Mainscreen extends StatefulWidget {
   const Mainscreen({super.key});
@@ -20,9 +17,18 @@ class _MainscreenState extends State<Mainscreen> {
         centerTitle: true,
         title: Text('Todo App'),
         actions: [
-          Padding(padding: const EdgeInsets.all(8.0), child: Icon(Icons.add)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GestureDetector(
+              onTap: () {
+                print('Plus icon is clicked');
+              },
+              child: Icon(Icons.add),
+            ),
+          ),
         ],
       ),
+      body: Center(child: Text('Todo App')),
     );
   }
 }
