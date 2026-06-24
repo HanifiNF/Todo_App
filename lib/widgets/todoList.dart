@@ -43,11 +43,32 @@ class _TodoListBuilderState extends State<TodoListBuilder> {
         : ListView.builder(
             itemCount: widget.todoList.length,
             itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                onTap: () {
-                  onItemClicked(index: index);
+              return Dismissible(
+                key: UniqueKey(),
+                direction: DismissDirection.startToEnd,
+                background: Container(
+                  color: Colors.green[400],
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(Icons.check),
+                      ),
+                    ],
+                  ),
+                ),
+                onDismissed: (direction) {
+                  setState(() {
+                    widget.todoList.removeAt(index);
+                  });
+                  widget.updateLocalData();
                 },
-                title: Text(widget.todoList[index]),
+                child: ListTile(
+                  onTap: () {
+                    onItemClicked(index: index);
+                  },
+                  title: Text(widget.todoList[index]),
+                ),
               );
             },
           );
