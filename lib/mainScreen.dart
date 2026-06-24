@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todoapp/addTodo.dart';
+import 'package:todoapp/widgets/todoList.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Mainscreen extends StatefulWidget {
   const Mainscreen({super.key});
@@ -13,6 +15,27 @@ class _MainscreenState extends State<Mainscreen> {
   List<String> todoList = [];
 
   void addTodo({required String todoText}) {
+    if (todoList.contains(todoText)) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Already exists"),
+            content: Text("This Data Already Exists"),
+            actions: [
+              InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Close"),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
     setState(() {
       todoList.insert(0, todoText);
     });
@@ -33,31 +56,72 @@ class _MainscreenState extends State<Mainscreen> {
     setState(() {});
   }
 
+  void showAddTodoBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            height: 180,
+            child: Addtodo(addTodo: addTodo),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(child: Text("Drawer Data")),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            Container(
+              color: Colors.blueGrey[900],
+              height: 200,
+              width: double.infinity,
+              child: Center(
+                child: Text(
+                  "Todo App",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                launchUrl(Uri.parse(""));
+              },
+              leading: Icon(Icons.person),
+              title: Text(
+                "About me",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                launchUrl(Uri.parse("mailto:someone@example.com"));
+              },
+              leading: Icon(Icons.email),
+              title: Text(
+                "Contact me",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
 
       appBar: AppBar(
         centerTitle: true,
         title: Text('Todo App'),
         actions: [
           InkWell(
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (context) {
-                  return Padding(
-                    padding: MediaQuery.of(context).viewInsets,
-                    child: Container(
-                      padding: EdgeInsets.all(20),
-                      height: 180,
-                      child: Addtodo(addTodo: addTodo),
-                    ),
-                  );
-                },
-              );
-            },
+            onTap: showAddTodoBottomSheet,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Icon(Icons.add),
@@ -65,33 +129,9 @@ class _MainscreenState extends State<Mainscreen> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: todoList.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (context) {
-                  return Container(
-                    padding: EdgeInsets.all(20),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          todoList.removeAt(index);
-                        });
-                        updateLocalData();
-                        Navigator.pop(context);
-                      },
-                      child: Text("Mark as done"),
-                    ),
-                  );
-                },
-              );
-            },
-            title: Text(todoList[index]),
-          );
-        },
+      body: TodoListBuilder(
+        todoList: todoList,
+        updateLocalData: updateLocalData,
       ),
     );
   }
